@@ -5,6 +5,10 @@ def change_sample_rate(wav_path, new_sample_rate):
     audio = AudioSegment.from_wav(wav_path)
     audio = audio.set_frame_rate(new_sample_rate)
     audio.export(wav_path, format="wav")
+    return audio
+
+def print_sample_rate(wav_path, audio):
+    print(f"{wav_path}의 샘플레이트: {audio.frame_rate} Hz")
 
 def process_folder(folder_path, new_sample_rate):
     file_list = os.listdir(folder_path)
@@ -15,20 +19,13 @@ def process_folder(folder_path, new_sample_rate):
         if os.path.isfile(file_path):
             base, extension = os.path.splitext(file_name)
             if extension.lower() == ".wav":
-                change_sample_rate(file_path, new_sample_rate)
-                print(f"{file_name}의 샘플레이트를 {new_sample_rate}로 변경 완료")
-
-def process_folders(root_folder, new_sample_rate):
-    for folder_name in os.listdir(root_folder):
-        folder_path = os.path.join(root_folder, folder_name)
-        
-        if os.path.isdir(folder_path):
-            process_folder(folder_path, new_sample_rate)
+                audio = change_sample_rate(file_path, new_sample_rate)
+                print_sample_rate(file_path, audio)
 
 if __name__ == "__main__":
-    root_folder = "./데이터(2차)"  # 여러 폴더가 들어있는 상위 폴더 경로 입력
+    folder_path = "./데이터(2차)/야생 동물/참새"  # 대상 폴더 경로 입력
     new_sample_rate = 44100  # 변경할 샘플레이트 입력
 
-    process_folders(root_folder, new_sample_rate)
+    process_folder(folder_path, new_sample_rate)
 
-print("전체 샘플레이트 변경 작업 완료")
+print("전체 샘플레이트 변경 및 확인 작업 완료")
