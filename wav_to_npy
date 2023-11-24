@@ -1,0 +1,40 @@
+import os
+import librosa
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 입력 폴더 경로
+input_folder_path = './데이터(2차)/합성 파일,잡음+아이(랜덤,노멀라이즈)_4'
+
+# 출력 폴더 경로
+output_folder_path = './데이터(2차)/합성 파일,잡음+아이(npy)'
+
+# 폴더 내의 모든 WAV 파일에 대해 처리
+for filename in os.listdir(input_folder_path):
+    if filename.endswith('.wav'):
+        # WAV 파일 경로
+        file_path = os.path.join(input_folder_path, filename)
+
+        # WAV 파일을 스펙트로그램으로 변환
+        y, sr = librosa.load(file_path, sr=None)
+        spec = librosa.feature.melspectrogram(y=y, sr=sr)
+
+        # 스펙트로그램 데이터를 행렬로 저장
+        spec_matrix = librosa.power_to_db(spec, ref=np.max)
+
+        # 저장할 파일 경로
+        output_filename = os.path.splitext(filename)[0] + '_spectrogram.npy'
+        output_path = os.path.join(output_folder_path, output_filename)
+
+        # 행렬 데이터를 파일로 저장
+        np.save(output_path, spec_matrix)
+
+        # 스펙트로그램 이미지 그리고 저장
+        plt.figure(figsize=(10, 6))
+        librosa.display.specshow(spec_matrix, sr=sr, x_axis='time', y_axis='mel')
+        plt.colorbar(format='%+2.0f dB')
+        plt.title('Mel Spectrogram')
+        plt.savefig(os.path.splitext(output_path)[0] + '.png')
+        plt.close()
+
+print("모든 WAV 파일을 스펙트로그램으로 변환하고 행렬과 이미지로 저장했습니다.")
